@@ -1,0 +1,48 @@
+- RAW DB Design
+[ ] Buyer
+    [ ] BuyerID (PK)
+    [ ] ShippingAddress
+    [ ] Contact
+    [ ] EMail
+    [ ] BidCount
+[ ] Seller
+    [ ] SellerID (PK)
+    [ ] ShippingAddress
+    [ ] Contact
+    [ ] EMail
+    [ ] SellCount
+[ ] Product
+    [ ] ProductID (PK)
+    [ ] SellerID (FK)
+    [ ] Category
+    [ ] TotalBids
+    [ ] TotalLikes
+    [ ] StartTime
+    [ ] EndTime
+    [ ] MinAmount
+    [ ] WinnerID
+    [ ] Status
+[ ] Bid
+    [ ] BidID (PK)
+    [ ] ProductID (FK)
+    [ ] Amount
+    [ ] BidTime
+    [ ] Status
+[ ] Category
+    [ ] CategoryID (PK)
+    [ ] CategoryName
+    [ ] TotalItems
+[ ] Messages
+    [ ] ProductID (PK)
+    [ ] BuyerID (FK)
+    [ ] SellerID (FK)
+[ ] Winner
+    [ ] WinnerID (PK)
+    [ ] BuyerID (FK)
+    [ ] ProductID (FK)
+    [ ] Amount
+[ ] WishlistItem
+    [ ] WishlistItemID (PK)
+    [ ] ProductID (FK)
+    [ ] BuyerID (FK)
+    [ ] TotalLikes
