@@ -12,6 +12,7 @@ class SellerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Seller
         fields = ("id", "name", "address", "contact", "email", "sell_count")
+        optional_fields = ('name')
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,14 +22,14 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ("id", "name", "seller_id", "buyer_id", "category_id", "total_bids", "total_likes", "start_time", "end_time", "bid_amount", "status")
+        fields = ("id", "name", "seller_id", "buyer_id", "category_id", "total_bids", "total_likes", "start_time", "end_time", "price", "status")
 
 class BidSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bid
-        fields = ("id", "product_id", "amount", "bid_time", "status")
+        fields = ("id", "product_id", "buyer_id", "amount", "bid_time", "status")
 
 class WishlistItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = WishlistItem
-        fields = ("id", "product_id", "buyer_id", "total_likes")
+        fields = ("id", "product_id", "buyer_id", "category_id")

@@ -1,4 +1,5 @@
-import datetime 
+import datetime
+from unicodedata import category 
 from django.db import models
 
 class Buyer(models.Model):
@@ -30,14 +31,14 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length = 255, null = False, blank = False)
-    seller_id = models.ForeignKey(Seller, null = False, blank = False, on_delete = models.CASCADE)
+    seller_id = models.ForeignKey(Seller, blank = False, on_delete = models.CASCADE)
     buyer_id = models.ForeignKey(Buyer, null = True, blank = True, on_delete = models.DO_NOTHING)
-    category_id = models.ForeignKey(Category, null = False, blank = False, on_delete = models.DO_NOTHING)
+    category_id = models.ForeignKey(Category, blank = False, on_delete = models.DO_NOTHING)
     total_bids = models.IntegerField(default = 0)
     total_likes = models.IntegerField(default = 0)
     start_time = models.DateTimeField(default = datetime.datetime.now())
     end_time = models.DateTimeField(default = datetime.datetime.now() + datetime.timedelta(days = 3))
-    bid_amount = models.IntegerField()
+    price = models.IntegerField()
     status = models.CharField(max_length = 10, default = 'Live')
 
     def __str__(self):
@@ -45,6 +46,7 @@ class Product(models.Model):
 
 class Bid(models.Model):
     product_id = models.ForeignKey(Product, on_delete = models.CASCADE)
+    buyer_id = models.ForeignKey(Buyer, on_delete = models.CASCADE)
     amount = models.IntegerField(null = False, blank = False)
     bid_time = models.DateTimeField(default = datetime.datetime.now())
     status = models.CharField(default = 'Pending', max_length = 20)
@@ -53,9 +55,9 @@ class Bid(models.Model):
         return str(self.product_id)
 
 class WishlistItem(models.Model):
-    product_id = models.ForeignKey(Product, on_delete = models.CASCADE)
-    buyer_id = models.ForeignKey(Buyer, null = True, blank = True, on_delete = models.DO_NOTHING)
-    total_likes = models.IntegerField(default = 0)
+    buyer_id = models.ForeignKey(Buyer, blank = False, on_delete = models.CASCADE)
+    product_id = models.ForeignKey(Product, blank = False, on_delete = models.CASCADE)
+    category_id = models.ForeignKey(Category, blank = False, on_delete = models.DO_NOTHING)
 
     def __str__(self):
         return str(self.product_id)
