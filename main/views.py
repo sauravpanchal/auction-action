@@ -15,6 +15,7 @@ def buyer(request):
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status = 200)
+        return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
     elif request.method == "GET":
         buyer = request.GET.get("buyer")
         try:
@@ -59,6 +60,7 @@ def seller(request):
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status = 200)
+        return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
     elif request.method == "GET":
         seller = request.GET.get("seller")
         try:
@@ -103,6 +105,7 @@ def category(request):
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status = 200)
+        return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
     elif request.method == "GET":
         name = request.GET.get("name")
         try:
@@ -144,6 +147,7 @@ def product(request):
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status = 200)
+        return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
     elif request.method == "GET":
         id = request.GET.get("id")
         try:
@@ -190,26 +194,45 @@ def bid(request):
     if request.method == "POST":
         data = JSONParser().parse(request)
         serializer = BidSerializer(data = data)
+        print(serializer)
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status = 200)
+        return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
     elif request.method == "GET":
         product_id = request.GET.get("product-id")
-        obj = Bid.objects.filter(product_id = product_id)
-        if not obj:
-            return JsonResponse({"Error 404" : "Not found"}, status = 404)
+        buyer_id = request.GET.get("buyer-id")
         final = dict()
-        for idx, obj in enumerate(Bid.objects.filter(product_id = product_id), 0):
-            result = dict()
-            result["id"] = obj.id
-            result["product_id"] = obj.product_id.id
-            result["buyer_id"] = obj.buyer_id.id
-            result["amount"] = obj.amount
-            result["bid_time"] = obj.bid_time
-            result["status"] = obj.status
+        if buyer_id:
+            obj = Bid.objects.filter(buyer_id = buyer_id)
+            if not obj:
+                return JsonResponse({"Error 404" : "Not found"}, status = 404)
+            for idx, obj in enumerate(Bid.objects.filter(buyer_id = buyer_id), 0):
+                result = dict()
+                result["id"] = obj.id
+                result["product_id"] = obj.product_id.id
+                result["buyer_id"] = obj.buyer_id.id
+                result["amount"] = obj.amount
+                result["bid_time"] = obj.bid_time
+                result["status"] = obj.status
 
-            final[idx] = result
-        return JsonResponse(final)
+                final[idx] = result
+            return JsonResponse(final)
+        else:
+            obj = Bid.objects.filter(product_id = product_id)
+            if not obj:
+                return JsonResponse({"Error 404" : "Not found"}, status = 404)
+            for idx, obj in enumerate(Bid.objects.filter(product_id = product_id), 0):
+                result = dict()
+                result["id"] = obj.id
+                result["product_id"] = obj.product_id.id
+                result["buyer_id"] = obj.buyer_id.id
+                result["amount"] = obj.amount
+                result["bid_time"] = obj.bid_time
+                result["status"] = obj.status
+
+                final[idx] = result
+            return JsonResponse(final)
     elif request.method == "PATCH":
         product_id = request.GET.get("product-id")
         try:
@@ -240,6 +263,7 @@ def wishlistitem(request):
         if serializer.is_valid():
             serializer.save()
             return JsonResponse(serializer.data, status = 200)
+        return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
     elif request.method == "GET":
         product_id = request.GET.get("product-id")
         obj = WishlistItem.objects.filter(product_id = product_id)
