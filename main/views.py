@@ -1,3 +1,4 @@
+from datetime import datetime
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse, Http404
 from main.models import Buyer, Seller, Category, Product, Bid, WishlistItem
@@ -145,6 +146,11 @@ def product(request):
         data = JSONParser().parse(request)
         serializer = ProductSerializer(data = data)
         if serializer.is_valid():
+            category_obj = serializer.validated_data.get("category_id")
+            category_value = Category.objects.get(id = category_obj.id)
+            if category_value:
+                category_value.total += 1
+                category_value.save(update_fields = ["total"])
             serializer.save()
             return JsonResponse(serializer.data, status = 200)
         return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
@@ -194,10 +200,15 @@ def bid(request):
     if request.method == "POST":
         data = JSONParser().parse(request)
         serializer = BidSerializer(data = data)
-        print(serializer)
         if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status = 200)
+            product_obj = serializer.validated_data.get("product_id")
+            product_value = Product.objects.get(id = product_obj.id)
+            # print(product_value.start_time, product_value.end_time)
+            if check_time(product_value.end_time.timestamp()):
+                serializer.save()
+                return JsonResponse(serializer.data, status = 200)
+            else:
+                return JsonResponse({"Not Live": "Bidding is over or not started yet !"}, status = 400)
         return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
     elif request.method == "GET":
         product_id = request.GET.get("product-id")
@@ -261,6 +272,11 @@ def wishlistitem(request):
         data = JSONParser().parse(request)
         serializer = WishlistItemSerializer(data = data)
         if serializer.is_valid():
+            product_obj = serializer.validated_data.get("product_id")
+            product_value = Product.objects.get(id = product_obj.id)
+            product_value.total_likes = WishlistItem.objects.filter(product_id = product_value).count()
+            product_value.total_bids = Bid.objects.filter(product_id = product_value.id).count()
+            product_value.save(update_fields = ["total_likes", "total_bids"])
             serializer.save()
             return JsonResponse(serializer.data, status = 200)
         return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
@@ -278,6 +294,7 @@ def wishlistitem(request):
             result["category_id"] = obj.category_id.id
 
             final[idx] = result
+        final["total_likes"] = len(final)
         return JsonResponse(final)
     elif request.method == "PATCH":
         product_id = request.GET.get("product-id")
@@ -299,3 +316,21 @@ def wishlistitem(request):
             return JsonResponse({"Error 404" : "Not found"}, status = 404)
         obj.delete()
         return HttpResponse(status = 204)
+
+
+def check_time(end_time):
+    now = datetime.now().timestamp()
+    if now <= end_time:
+        return True
+    return False
+
+def update_bid_status(request):
+    obj = Product.objects.all()
+    for o in obj:
+        if not check_time(o.end_time.timestamp()):
+            bid_obj = Bid.objects.filter(product_id = o.id).last()
+            o.status = "Not Alive"
+            o.buyer_id = bid_obj.buyer_id
+            o.price = bid_obj.amount
+            o.save()
+    return HttpResponse(status = 204)

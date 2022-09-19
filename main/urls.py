@@ -8,4 +8,6 @@ urlpatterns = [
     path("product-details", views.product, name = "product"),
     path("bid-details", views.bid, name = "bid"),
     path("wishlistitem-details", views.wishlistitem, name = "wishlistitem"),
+
+    path("update-bid-status", views.update_bid_status, name = "update-bid-status"),
 ]
