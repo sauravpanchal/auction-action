@@ -62,26 +62,29 @@ def buyer(request):
 @csrf_exempt
 def seller(request):
     if request.method == "POST":
-        data = JSONParser().parse(request)
-        serializer = SellerSerializer(data = data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status = 200)
-        return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
+        cond, serialized_data = handle_post(request, SellerSerializer)
+        # data = JSONParser().parse(request)
+        # serializer = SellerSerializer(data = data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        if cond:
+            return JsonResponse(serialized_data, status = 200)
+        return JsonResponse(serialized_data, status = 400)
     elif request.method == "GET":
         seller = request.GET.get("seller")
         try:
             obj = Seller.objects.get(name = seller)
         except:
             return JsonResponse({"Error 404" : "Not found"}, status = 404)
-        result = dict()
-        for obj in Seller.objects.filter(name = seller):
-            result["id"] = obj.id
-            result["name"] = obj.name
-            result["address"] = obj.address
-            result["contact"] = obj.contact
-            result["email"] = obj.email
-            result["sell_count"] = obj.sell_count
+        result = handle_get_by_name(Seller, seller)
+        # result = dict()
+        # for obj in Seller.objects.filter(name = seller):
+        #     result["id"] = obj.id
+        #     result["name"] = obj.name
+        #     result["address"] = obj.address
+        #     result["contact"] = obj.contact
+        #     result["email"] = obj.email
+        #     result["sell_count"] = obj.sell_count
         return JsonResponse({"result" : result})
     elif request.method == "PATCH":
         seller = request.GET.get("seller")
@@ -89,12 +92,14 @@ def seller(request):
             obj = Seller.objects.get(name = seller)
         except:
             return JsonResponse({"Error 404" : "Not found"}, status = 404)
-        data = JSONParser().parse(request)
-        serializer = SellerSerializer(obj, data = data, partial = True)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status = 201)
-        return JsonResponse(serializer.errors, status = 400)
+        cond, serialized_data = handle_patch(request, SellerSerializer, obj)
+        # data = JSONParser().parse(request)
+        # serializer = SellerSerializer(obj, data = data, partial = True)
+        # if serializer.is_valid():
+        #     serializer.save()
+        if cond:
+            return JsonResponse(serialized_data, status = 201)
+        return JsonResponse(serialized_data, status = 400)
     elif request.method == "DELETE":   
         seller = request.GET.get("seller")    
         try:
@@ -107,23 +112,26 @@ def seller(request):
 @csrf_exempt
 def category(request):
     if request.method == "POST":
-        data = JSONParser().parse(request)
-        serializer = CategorySerializer(data = data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status = 200)
-        return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
+        cond, serialized_data = handle_post(request, CategorySerializer)
+        # data = JSONParser().parse(request)
+        # serializer = CategorySerializer(data = data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        if cond:
+            return JsonResponse(serialized_data, status = 200)
+        return JsonResponse(serialized_data, status = 400)
     elif request.method == "GET":
         name = request.GET.get("name")
         try:
             obj = Category.objects.get(name = name)
         except:
             return JsonResponse({"Error 404" : "Not found"}, status = 404)
-        result = dict()
-        for obj in Category.objects.filter(name = name):
-            result["id"] = obj.id
-            result["name"] = obj.name
-            result["total"] = obj.total
+        result = handle_get_by_name(Category, name)
+        # result = dict()
+        # for obj in Category.objects.filter(name = name):
+        #     result["id"] = obj.id
+        #     result["name"] = obj.name
+        #     result["total"] = obj.total
         return JsonResponse(result)
     elif request.method == "PATCH":
         name = request.GET.get("name")
@@ -131,12 +139,14 @@ def category(request):
             obj = Category.objects.get(name = name)
         except:
             return JsonResponse({"Error 404" : "Not found"}, status = 404)
-        data = JSONParser().parse(request)
-        serializer = CategorySerializer(obj, data = data, partial = True)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status = 201)
-        return JsonResponse(serializer.errors, status = 400)
+        cond, serialized_data = handle_patch(request, CategorySerializer, obj)
+        # data = JSONParser().parse(request)
+        # serializer = CategorySerializer(obj, data = data, partial = True)
+        # if serializer.is_valid():
+        #     serializer.save()
+        if cond:
+            return JsonResponse(serialized_data, status = 201)
+        return JsonResponse(serialized_data, status = 400)
     elif request.method == "DELETE":   
         name = request.GET.get("name")    
         try:
@@ -291,29 +301,32 @@ def wishlistitem(request):
         obj = WishlistItem.objects.filter(product_id = product_id)
         if not obj:
             return JsonResponse({"Error 404" : "Not found"}, status = 404)
-        final = dict()
-        for idx, obj in enumerate(WishlistItem.objects.filter(product_id = product_id), 0):
-            result = dict()
-            result["id"] = obj.id
-            result["product_id"] = obj.product_id.id
-            result["buyer_id"] = obj.buyer_id.id
-            result["category_id"] = obj.category_id.id
+        result = handle_get_by_name(WishlistItem, product_id)
+        # final = dict()
+        # for idx, obj in enumerate(WishlistItem.objects.filter(product_id = product_id), 0):
+        #     result = dict()
+        #     result["id"] = obj.id
+        #     result["product_id"] = obj.product_id.id
+        #     result["buyer_id"] = obj.buyer_id.id
+        #     result["category_id"] = obj.category_id.id
 
-            final[idx] = result
-        final["total_likes"] = len(final)
-        return JsonResponse(final)
+        #     final[idx] = result
+        # final["total_likes"] = len(final)
+        return JsonResponse(result)
     elif request.method == "PATCH":
         product_id = request.GET.get("product-id")
         try:
             obj = WishlistItem.objects.filter(product_id = product_id).last()
         except:
             return JsonResponse({"Error 404" : "Not found"}, status = 404)
-        data = JSONParser().parse(request)
-        serializer = WishlistItemSerializer(obj, data = data, partial = True)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status = 201)
-        return JsonResponse(serializer.errors, status = 400)
+        cond, serialized_data = handle_patch(request, WishlistItemSerializer, obj)
+        # data = JSONParser().parse(request)
+        # serializer = WishlistItemSerializer(obj, data = data, partial = True)
+        # if serializer.is_valid():
+        #     serializer.save()
+        if cond:
+            return JsonResponse(serialized_data, status = 201)
+        return JsonResponse(serialized_data, status = 400)
     elif request.method == "DELETE":   
         product_id = request.GET.get("product-id")    
         try:

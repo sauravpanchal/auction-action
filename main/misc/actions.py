@@ -10,7 +10,20 @@ def handle_post(request, Serializer):
 
 def handle_get_by_name(Serializer, key_val):
     result = dict()
-    for idx, obj in enumerate(Serializer.objects.filter(name = key_val).values(), 1):
+    for idx, obj in enumerate(Serializer.objects.filter(name = key_val).values(), 0):
+        result[idx] = obj
+    return result
+
+def handle_get_by_product_id(Serializer, key_val):
+    result = dict()
+    for idx, obj in enumerate(Serializer.objects.filter(product_id = key_val).value(), 0):
+        result[idx] = obj
+    result["total_likes"] = len(result)
+    return result
+
+def handle_get_by_id(Serializer, key_val):
+    result = dict()
+    for idx, obj in enumerate(Serializer.objects.filter(id = key_val).values(), 0):
         result[idx] = obj
     return result
 
