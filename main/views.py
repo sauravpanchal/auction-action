@@ -6,31 +6,35 @@ from django.middleware.csrf import get_token
 from rest_framework.parsers import JSONParser
 from django.views.decorators.csrf import csrf_exempt
 from .serializers import BidSerializer, BuyerSerializer, CategorySerializer, ProductSerializer, SellerSerializer, WishlistItemSerializer
+from .misc.actions import handle_get_by_name, handle_post, handle_patch, handle_delete
 
 @csrf_exempt
 def buyer(request):
     # print(get_token(request))
     if request.method == "POST":
-        data = JSONParser().parse(request)
-        serializer = BuyerSerializer(data = data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status = 200)
-        return JsonResponse({"Bad Request": "Inconsistent request"}, status = 400)
+        cond, serialized_data = handle_post(request, BuyerSerializer)
+        # data = JSONParser().parse(request)
+        # serializer = BuyerSerializer(data = data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        if cond:
+            return JsonResponse(serialized_data, status = 200)
+        return JsonResponse(serialized_data, status = 400)
     elif request.method == "GET":
         buyer = request.GET.get("buyer")
         try:
             obj = Buyer.objects.get(name = buyer)
         except:
             return JsonResponse({"Error 404" : "Not found"}, status = 404)
-        result = dict()
-        for obj in Buyer.objects.filter(name = buyer):
-            result["id"] = obj.id
-            result["name"] = obj.name
-            result["address"] = obj.address
-            result["contact"] = obj.contact
-            result["email"] = obj.email
-            result["bid_count"] = obj.bid_count
+        result = handle_get_by_name(Buyer, buyer)
+        # result = dict()
+        # for obj in Buyer.objects.filter(name = buyer):
+        #     result["id"] = obj.id
+        #     result["name"] = obj.name
+        #     result["address"] = obj.address
+        #     result["contact"] = obj.contact
+        #     result["email"] = obj.email
+        #     result["bid_count"] = obj.bid_count
         return JsonResponse({"result" : result})
     elif request.method == "PATCH":
         buyer = request.GET.get("buyer")
@@ -38,14 +42,16 @@ def buyer(request):
             obj = Buyer.objects.get(name = buyer)
         except:
             return JsonResponse({"Error 404" : "Not found"}, status = 404)
-        data = JSONParser().parse(request)
-        serializer = BuyerSerializer(obj, data = data, partial = True)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status = 201)
-        return JsonResponse(serializer.errors, status = 400)
+        cond, serialized_data = handle_patch(request, BuyerSerializer, obj)
+        # data = JSONParser().parse(request)
+        # serializer = BuyerSerializer(obj, data = data, partial = True)
+        # if serializer.is_valid():
+        #     serializer.save()
+        if cond:
+            return JsonResponse(serialized_data, status = 201)
+        return JsonResponse(serialized_data, status = 400)
     elif request.method == "DELETE":   
-        buyer = request.GET.get("buyer")    
+        buyer = request.GET.get("buyer")  
         try:
             obj = Buyer.objects.get(name = buyer)
         except:
