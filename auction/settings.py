@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 from pathlib import Path
 
 from dotenv import load_dotenv
+from datetime import timedelta
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -43,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
+    'djoser',
     'main',
 ]
 
@@ -140,3 +142,59 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated"
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # "rest_framework.authentication.TokenAuthentication",
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ],
+}
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'ROTATE_REFRESH_TOKENS': False,
+    'BLACKLIST_AFTER_ROTATION': False,
+    'UPDATE_LAST_LOGIN': True,
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+DOMAIN = "auction-action.com"
+SITE_NAME = "Auction Action"
+
+DJOSER = {
+    "LOGIN_FIELD": "email",
+    "USER_CREATE_PASSWORD_RETYPE": True, # If True, you need to pass re_password to /users/ endpoint, to validate password equality.
+    "USERNAME_CHANGED_EMAIL_CONFIRMATION": True, # If True, change username endpoints will send confirmation email to user.
+    "PASSWORD_CHANGED_EMAIL_CONFIRMATION": True, # If True, change password endpoints will send confirmation email to user.
+    "SEND_CONFIRMATION_EMAIL": True, # If True, register or activation endpoint will send confirmation email to user.
+    "SET_PASSWORD_RETYPE": True, # If True, you need to pass re_new_password to /users/set_password/ endpoint, to validate password equality.
+    "PASSWORD_RESET_CONFIRM_RETYPE": True, # If True, you need to pass re_new_password to /users/reset_password_confirm/ endpoint in order to validate password equality.
+    "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}", # URL to your frontend password reset page. It should contain {uid} and {token} placeholders, e.g. #/password-reset/{uid}/{token}. You should pass uid and token to reset password confirmation endpoint.
+    "USERNAME_RESET_CONFIRM_URL": "email/reset/confirm/{uid}/{token}", # URL to your frontend username reset page. It should contain {uid} and {token} placeholders, e.g. #/username-reset/{uid}/{token}. You should pass uid and token to reset password confirmation endpoint.
+    "ACTIVATION_URL": "activate/{uid}/{token}", # URL to your frontend activation page. It should contain {uid} and {token} placeholders, e.g. #/activate/{uid}/{token}. You should pass uid and token to activation endpoint.
+    "SEND_ACTIVATION_EMAIL": True, 
+    "SERIALIZERS": {
+        "user_create": "accounts.serializers.UserCreateSerializer",
+        "user": "accounts.serializers.UserCreateSerializer",
+        "user_delete": "djoser.serializers.UserDeleteSerializer",
+    },
+    "EMAIL": {
+        "activation": "core.email.ActivationEmail"
+    }
+}
+
+AUTH_USER_MODEL = "accounts.UserAccount"
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+# react integration
+# CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:3000']
+# CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ALLOW_HEADERS = ('accept-encoding','content-type', 'accept', 'origin', 'authorization', 'Token')
