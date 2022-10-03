@@ -1,5 +1,7 @@
 from dataclasses import field
 from rest_framework import serializers
+from djoser.serializers import UserCreateSerializer
+from django.contrib.auth import get_user_model
 
 from .models import Buyer, Seller, Category, Product, Bid, WishlistItem
 
@@ -33,3 +35,10 @@ class WishlistItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = WishlistItem
         fields = ("id", "product_id", "buyer_id", "category_id")
+
+User = get_user_model()
+
+class UserCreateSerializer(UserCreateSerializer):
+    class Meta(UserCreateSerializer.Meta):
+        model = User
+        fields = ("id", "name", "address", "contact", "email", "type", "password")

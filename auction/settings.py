@@ -44,8 +44,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'rest_framework',
-    'djoser',
     'main',
+    'djoser',
 ]
 
 MIDDLEWARE = [
@@ -143,6 +143,23 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+'''
+EMail ID : .env/EMAIL_ID
+Password : .env/EMAIL_PASSWORD
+EMail Host Password : .env/EMAIL_HOST_PASSWORD
+'''
+
+EMAIL_ID_VAR = os.getenv("EMAIL_ID")
+EMAIL_PASSWORD_VAR = os.getenv("EMAIL_PASSWORD")
+EMAIL_HOST_PASSWORD_VAR = os.getenv("EMAIL_HOST_PASSWORD")
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_HOST_USER = EMAIL_ID_VAR
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD_VAR
+EMAIL_USE_TLS = True
+
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.IsAuthenticated"
@@ -179,18 +196,19 @@ DJOSER = {
     "PASSWORD_RESET_CONFIRM_URL": "password/reset/confirm/{uid}/{token}", # URL to your frontend password reset page. It should contain {uid} and {token} placeholders, e.g. #/password-reset/{uid}/{token}. You should pass uid and token to reset password confirmation endpoint.
     "USERNAME_RESET_CONFIRM_URL": "email/reset/confirm/{uid}/{token}", # URL to your frontend username reset page. It should contain {uid} and {token} placeholders, e.g. #/username-reset/{uid}/{token}. You should pass uid and token to reset password confirmation endpoint.
     "ACTIVATION_URL": "activate/{uid}/{token}", # URL to your frontend activation page. It should contain {uid} and {token} placeholders, e.g. #/activate/{uid}/{token}. You should pass uid and token to activation endpoint.
-    "SEND_ACTIVATION_EMAIL": True, 
+    "SEND_ACTIVATION_EMAIL": True,
+    "SEND_UPDATE_EMAIL": False, 
     "SERIALIZERS": {
-        "user_create": "accounts.serializers.UserCreateSerializer",
-        "user": "accounts.serializers.UserCreateSerializer",
+        "user_create": "main.serializers.UserCreateSerializer",
+        "user": "main.serializers.UserCreateSerializer",
         "user_delete": "djoser.serializers.UserDeleteSerializer",
     },
-    "EMAIL": {
-        "activation": "core.email.ActivationEmail"
-    }
+    # "EMAIL": {
+    #     "activation": "core.email.ActivationEmail"
+    # }
 }
 
-AUTH_USER_MODEL = "accounts.UserAccount"
+AUTH_USER_MODEL = "main.UserAccount"
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 

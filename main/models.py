@@ -1,6 +1,6 @@
 import datetime
-from unicodedata import category 
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 class Buyer(models.Model):
     name = models.CharField(max_length = 35)
@@ -61,3 +61,37 @@ class WishlistItem(models.Model):
 
     def __str__(self):
         return str(self.product_id)
+
+# Extending UserModel
+class UserAccountManager(BaseUserManager):
+    def create_user(self, name, address, contact, email, type, password = None):
+        if not email:
+            raise ValueError("User must have an Email address")
+
+        email = self.normalize_email(email)
+        user = self.model(name = name, address = address, contact = contact, email = email, type = type)
+        user.set_password(password)
+        user.save()
+
+        return user
+
+class UserAccount(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(max_length = 255, unique = True)
+    name = models.CharField(max_length = 255)
+    address = models.CharField(max_length = 255)
+    contact = models.CharField(max_length = 255)
+    email = models.EmailField(max_length = 25, unique = True)
+    type = models.CharField(max_length = 6, default = "Buyer")
+    is_active = models.BooleanField(default = True)
+    is_staff = models.BooleanField(default = False)
+
+    USERNAME_FIELD = "email"
+    REQUIRED_FIELDS = ["name", "address", "contact", "type"]
+
+    objects = UserAccountManager()
+
+    def get_full_name(self):
+        return self.name
+
+    def __str__(self) -> str:
+        return self.email
