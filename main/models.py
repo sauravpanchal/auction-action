@@ -31,6 +31,8 @@ class Category(models.Model):
 
 class Product(models.Model):
     name = models.CharField(max_length = 255, null = False, blank = False)
+    # TODO: Images (bytea [data-type], not null)
+    # TODO: Description (1600 Chars)
     seller_id = models.ForeignKey(Seller, blank = False, on_delete = models.CASCADE)
     buyer_id = models.ForeignKey(Buyer, null = True, blank = True, on_delete = models.DO_NOTHING)
     category_id = models.ForeignKey(Category, blank = False, on_delete = models.DO_NOTHING)
