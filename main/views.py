@@ -8,6 +8,14 @@ from django.views.decorators.csrf import csrf_exempt
 from .serializers import BidSerializer, BuyerSerializer, CategorySerializer, ProductSerializer, SellerSerializer, WishlistItemSerializer
 from .misc.actions import handle_get_by_name, handle_post, handle_patch, handle_delete
 
+"""
+class UserView:
+class CategoryView:
+class ProductView:
+class WishlistItemView:
+class BidView:
+"""
+
 @csrf_exempt
 def buyer(request):
     # print(get_token(request))
