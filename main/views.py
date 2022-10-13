@@ -10,7 +10,7 @@ from .misc.actions import handle_get_by_name, handle_post, handle_patch, handle_
 
 """
 class UserView:
-class CategoryView:
+    def get(self, request, format = None):
 class ProductView:
 class WishlistItemView:
 class BidView:
