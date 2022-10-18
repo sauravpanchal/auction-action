@@ -38,7 +38,7 @@ class WishlistItemSerializer(serializers.ModelSerializer):
 
 User = get_user_model()
 
-class UserCreateSerializer(UserCreateSerializer):
+class UserSerializer(UserCreateSerializer):
     class Meta(UserCreateSerializer.Meta):
         model = User
         fields = ("id", "name", "address", "contact", "email", "type", "password")

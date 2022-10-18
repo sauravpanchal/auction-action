@@ -75,7 +75,13 @@ class UserAccountManager(BaseUserManager):
         user = self.model(name = name, address = address, contact = contact, email = email, type = type)
         user.set_password(password)
         user.save()
-
+        return user
+    
+    def create_superuser(self, name, address, contact, email, type, password):
+        email = self.normalize_email(email)
+        user = self.model(name = name, address = address, contact = contact, email = email, type = type, is_staff = True, is_superuser = True)
+        user.set_password(password)
+        user.save()
         return user
 
 class UserAccount(AbstractBaseUser, PermissionsMixin):

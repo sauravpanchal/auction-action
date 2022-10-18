@@ -8,6 +8,9 @@ from django.views.decorators.csrf import csrf_exempt
 from .serializers import BidSerializer, BuyerSerializer, CategorySerializer, ProductSerializer, SellerSerializer, WishlistItemSerializer
 from .misc.actions import handle_get_by_name, handle_post, handle_patch, handle_delete
 
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
+
 """
 class UserView:
     def get(self, request, format = None):
@@ -17,6 +20,8 @@ class BidView:
 """
 
 @csrf_exempt
+@login_required(login_url = "http://127.0.0.1:8000/auth/jwt/create/")
+@require_http_methods(["GET"])
 def buyer(request):
     # print(get_token(request))
     if request.method == "POST":
